@@ -3,15 +3,20 @@ import os
 
 class Search():
     def __init__(self):
-        self.total_doc = 3204
+        self.total_doc_num = 3204
         self.target_words_list = []
-        self.RevIndexDic = {}
-        self.doc_list = []
+        self.rev_index_dic = {}
+        self.doc_list = []                  # 存储所有文档名称的列表
+        self.sim_dic = {}                   
+        self.all_words_list = []           # 存储所有词的列表
+        self.words_r_dic = {}               # 存储每个单词的r值
+        self.words_p_dic = {}               # 存储每个单词的p值
 
-    def GetAllDoc(self, dirname='/Period1/cacm'):
-        # last_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
-        cur = os.getcwd()
-        temp_list = os.listdir(cur + dirname)
+
+    def GetAllDoc(self, dirname=r'\\Period1\\cacm'):
+        last_dir = os.path.abspath(os.path.dirname(os.getcwd()))
+        # cur = os.getcwd()
+        temp_list = os.listdir(last_dir + dirname)
         for each in temp_list:
             self.doc_list.append(each[5:9])
         return self.doc_list
@@ -34,16 +39,21 @@ class Search():
         
     def LoadRevIndex(self):
         with open('RevIndex.txt', 'r') as json_file:
-            self.RevIndexDic = json.load(json_file)
-        return self.RevIndexDic
+            self.rev_index_dic = json.load(json_file)
+        self.all_words_list = list(self.rev_index_dic.keys())
+        # print(list(self.rev_index_dic.keys()))
+        return self.rev_index_dic
 
-    
+    def CalPR1st(self):
+        self.LoadRevIndex()
+        self.GetAllDoc()
+        for word in self.all_words_list:
+            self.words_p_dic[word] = 0.5        # 使用初始P值
+            self.words_r_dic[word] = len(self.rev_index_dic[word]['files']) / self.total_doc_num
+        return self.words_p_dic, self.words_r_dic
 
-    
     
 if __name__ == '__main__':
     m_s = Search()
-    # li = m_s.GetInput()
-    # dic = m_s.LoadRevIndex()
-    # print(li)
-    m_s.GetAllDoc()
+    _, rd = m_s.CalPR1st()
+    print(rd['language'])
