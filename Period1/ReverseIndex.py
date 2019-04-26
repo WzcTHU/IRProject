@@ -70,7 +70,6 @@ class ReverseIndex():
                     if(each_term not in self.rev_index):
                         self.rev_index[each_term] = \
                             {'total_num': 1, 'files': {self.__file_list[i][5:9]: 1}}
-                    else:
                         self.rev_index[each_term]['total_num'] += 1
                         if(self.__file_list[i][5:9] in self.rev_index[each_term]['files']):
                             self.rev_index[each_term]['files'][self.__file_list[i][5:9]] += 1
