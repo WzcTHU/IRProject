@@ -39,11 +39,14 @@ class SpellCorrect:
     def correct(self, word):
         self.LoadNWORDS()
         candidates = self.known([word]) or self.known(self.edits1(word)) or self.known_edits2(word) or [word]
-        return max(candidates, key=lambda w: self.NWORDS[w])
+        if(list(candidates)[0] in self.NWORDS.keys()):
+            return max(candidates, key=lambda w: self.NWORDS[w])
+        else:
+            return word
 
 if __name__ == '__main__':
     # print(type(NWORDS))
     m_c = SpellCorrect()
     start_time = time.process_time()
-    print(m_c.correct('happiness'))
+    print(m_c.correct('computor'))
     print(time.process_time() - start_time)

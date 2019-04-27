@@ -12,6 +12,7 @@ class SearchApp:
         m_search.CalSim()
         # print(time.process_time() - start_time)
         m_search.ShowResult()
+        input()
 
 if __name__ == '__main__':
     m_search_app = SearchApp()

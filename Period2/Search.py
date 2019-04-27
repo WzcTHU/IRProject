@@ -15,9 +15,9 @@ class Search():
         self.words_p_dic = {}               # 存储每个单词的p值
         self.result_list = []
 
-    def __GetAllDoc(self, dirname=r'\\Period1\\cacm'):
-        last_dir = os.path.abspath(os.path.dirname(os.getcwd()))
-        temp_list = os.listdir(last_dir + dirname)
+    def __GetAllDoc(self, dirname=r'\\cacm'):
+        # last_dir = os.path.abspath(os.path.dirname(os.getcwd()))
+        temp_list = os.listdir(os.getcwd() + dirname)
         for each in temp_list:
             self.doc_list.append(each[5:9])
         return self.doc_list
@@ -38,8 +38,11 @@ class Search():
         
         # 进行拼写检查并纠正
         m_corrector = SpellCorrect()
-        for i in range(0, len(self.target_words_list)):
-            self.target_words_list[i] = m_corrector.correct(self.target_words_list[i]) 
+        temp_list = []
+        for each in self.target_words_list:
+            temp_list.append(m_corrector.correct(each))
+        self.target_words_list.extend(temp_list)
+        self.target_words_list = list(set(self.target_words_list))      # 去重
         return self.target_words_list
         
     def __LoadRevIndex(self):
@@ -87,7 +90,7 @@ class Search():
                 self.words_r_dic[word] = ri
         return self.words_p_dic, self.words_r_dic
 
-    def ShowResult(self, show_num=50):
+    def ShowResult(self, show_num=10):
         print('The result of search: ')
         for each_doc in self.result_list[0:show_num]:
             print('CACM-' + each_doc[0] + '.html', 'Similarity: ' + str(each_doc[1]))
