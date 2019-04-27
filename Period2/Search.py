@@ -1,6 +1,7 @@
 import json 
 import os
 import math as m
+from SpellCorrect import SpellCorrect
 
 class Search():
     def __init__(self):
@@ -34,6 +35,11 @@ class Search():
         for each in temp_list:
             if(each.lower() not in self.target_words_list):
                 self.target_words_list.append(each.lower())
+        
+        # 进行拼写检查并纠正
+        m_corrector = SpellCorrect()
+        for i in range(0, len(self.target_words_list)):
+            self.target_words_list[i] = m_corrector.correct(self.target_words_list[i]) 
         return self.target_words_list
         
     def __LoadRevIndex(self):
