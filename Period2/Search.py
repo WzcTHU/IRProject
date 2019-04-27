@@ -10,11 +10,9 @@ class Search():
         self.rev_index_dic = {}
         self.doc_list = []                  # 存储所有文档名称的列表
         self.sim_dic = {}                   
-        self.all_words_list = []           # 存储所有词的列表
         self.words_r_dic = {}               # 存储每个单词的r值
         self.words_p_dic = {}               # 存储每个单词的p值
         self.result_list = []
-
 
     def __GetAllDoc(self, dirname=r'\\Period1\\cacm'):
         last_dir = os.path.abspath(os.path.dirname(os.getcwd()))
@@ -41,15 +39,15 @@ class Search():
     def __LoadRevIndex(self):
         with open('RevIndex.txt', 'r') as json_file:
             self.rev_index_dic = json.load(json_file)
-        self.all_words_list = list(self.rev_index_dic.keys())
         return self.rev_index_dic
 
     def CalPR1st(self):
         self.__LoadRevIndex()
         self.__GetAllDoc()
-        for word in self.all_words_list:
-            self.words_p_dic[word] = 0.5        # 使用初始P值
-            self.words_r_dic[word] = len(self.rev_index_dic[word]['files']) / self.N
+        for word in self.target_words_list:
+            if word in self.rev_index_dic.keys():
+                self.words_p_dic[word] = 0.5        # 使用初始P值
+                self.words_r_dic[word] = len(self.rev_index_dic[word]['files']) / self.N
         return self.words_p_dic, self.words_r_dic
 
     def CalSim(self):
@@ -63,35 +61,39 @@ class Search():
                         pi = self.words_p_dic[each_word]
                         ri = self.words_r_dic[each_word]
                         self.sim_dic[each_doc] += m.log10((pi / (1 - pi)) * ((1 - ri) / ri))
-
+            self.sim_dic[each_doc] = abs(self.sim_dic[each_doc])
         # 挑选50个相似度最高的文档
-        self.result_list = sorted(self.sim_dic.items(), key=lambda x:x[1], reverse=True)[0:self.V]
+        self.result_list = sorted(self.sim_dic.items(), key=lambda x:x[1], reverse=True)
         return self.result_list
 
     def CalPR2nd(self):
         top_doc_list = self.result_list
-        for word in self.all_words_list:
-            Vi = 0
-            ni = len(self.rev_index_dic[word]['files'])
-            for each_doc in top_doc_list:           # 计算该word出现在几个被选中的文档中
-                if(each_doc in self.rev_index_dic[word]['files'].keys()):
-                    Vi += 1
-            pi = (Vi + ni / self.N) / (self.V + 1)
-            self.words_p_dic[word] = pi
-            ri = (ni - Vi + ni / self.V) / (self.N - self.V + 1)
-            self.words_r_dic[word] = ri
+        for word in self.target_words_list:
+            if word in self.rev_index_dic.keys():
+                Vi = 0
+                ni = len(self.rev_index_dic[word]['files'])
+                for each_doc in top_doc_list:           # 计算该word出现在几个被选中的文档中
+                    if(each_doc in self.rev_index_dic[word]['files'].keys()):
+                        Vi += 1
+                pi = (Vi + (ni / self.N)) / (self.V + 1)
+                self.words_p_dic[word] = pi
+                ri = (ni - Vi + (ni / self.V)) / (self.N - self.V + 1)
+                self.words_r_dic[word] = ri
+        return self.words_p_dic, self.words_r_dic
 
-    
+    def ShowResult(self, show_num=50):
+        print('The result of search: ')
+        for each_doc in self.result_list[0:show_num]:
+            print('CACM-' + each_doc[0] + '.html', 'Similarity: ' + str(each_doc[1]))
+
+
 if __name__ == '__main__':
     m_s = Search()
     m_s.GetInput()
     m_s.CalPR1st()
     m_s.CalSim()
-    print(m_s.words_p_dic['language'])
 
-    # print(m_s.result_list)
+    print(m_s.result_list)
     m_s.CalPR2nd()
     m_s.CalSim()
-    # print(m_s.result_list)
-    print(m_s.words_p_dic['language'])
-    # print(rd['language'])
+    print(m_s.result_list)
