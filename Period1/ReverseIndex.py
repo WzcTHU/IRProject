@@ -79,7 +79,7 @@ class ReverseIndex():
 
     def write_index(self, file_name):
         f_w = open(file_name, 'w')
-        f_w.write(json.dumps(self.rev_index))
+        f_w.write(json.dumps(self.rev_index, indent=1))
         f_w.close()
         
 if __name__ == '__main__':
