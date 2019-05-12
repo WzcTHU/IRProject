@@ -9,3 +9,7 @@ class SpiderApp:
         suburl = self.spider.AnalysisHtml(html)
         dic = self.spider.BFS(suburl)
         print('Grabing finished, ' + len(dic) + ' results in total')
+
+if __name__ == '__main__':
+    m_app = SpiderApp()
+    m_app.Run()

@@ -54,7 +54,7 @@ class Spider:
             title = re.findall(r'.*', title[0])
             return title[0]
         except:
-            return 'Nothing'
+            return ''
 
     def BFS(self, url_list):
         i_n = 0
@@ -69,7 +69,7 @@ class Spider:
                 if(each_url not in self.result_dict.keys()):
                     each_html = self.OpenUrl(each_url)
                     each_title = self.GetTitle(each_url, each_html)
-                    if(each_title != 'Nothing'):
+                    if(each_title != ''):
                         self.result_dict[each_url] = each_title
                     each_url_list = self.AnalysisHtml(each_html)
                     temp_url_list.extend(each_url_list)
